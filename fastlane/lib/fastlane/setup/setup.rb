@@ -14,6 +14,9 @@ module Fastlane
       elsif is_android?
         UI.message("Detected Android project in current directory...")
         platform = :android
+      elseif is_xamarin?
+        UI.message("Detected Xamarin project in current directory...")
+        platform = :xamarin
       else
         UI.message("Couldn't automatically detect the platform")
         val = agree("Is this project an iOS project? (y/n) ".yellow, true)
@@ -24,6 +27,7 @@ module Fastlane
         SetupIos.new.run
       elsif platform == :android
         SetupAndroid.new.run
+      elsif platform == :xamarin
       else
         UI.user_error!("Couldn't find platform '#{platform}'")
       end
@@ -35,6 +39,10 @@ module Fastlane
 
     def is_android?
       Dir["*.gradle"].count > 0
+    end
+
+    def is_xamarin?
+      Dir["*.csproj"].count > 0
     end
 
     def show_analytics
