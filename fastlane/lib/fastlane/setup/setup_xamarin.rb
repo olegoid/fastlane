@@ -26,6 +26,7 @@ module Fastlane
         ask_for_apple_id
         detect_if_app_is_available
         print_config_table
+
         if UI.confirm("Please confirm the above values")
           default_setup
         else
@@ -63,7 +64,7 @@ module Fastlane
       rows << ["Apple ID", self.apple_id]
       rows << ["App Name", self.app_name]
       rows << ["App Identifier", self.app_identifier]
-      rows << [self.project.path]
+      rows << [self.xamarin_solution.path]
       require 'terminal-table'
       puts ""
       puts Terminal::Table.new(rows: rows, title: "Detected Values")
@@ -87,9 +88,9 @@ module Fastlane
     def setup_project
       config = {}
       FastlaneCore::XamarinSolution.detect_solutions(config)
-      self.xamarin_solution = FastlaneCore::XamarinSolution.new(config)
+      self.xamarin_solution = FastlaneCore::XamarinSolutionParser.parse(config[:xamarin_solution])
 
-      if self.xamarin_solution.apple_projects.lenght > 1
+      if self.xamarin_solution.apple_projects.length > 1
         # User Selection
         loop do
           # Multiple apple projects(iOS, Mac, tvOS) found in solution, user has to select
@@ -103,14 +104,12 @@ module Fastlane
           self.xamarin_project = self.xamarin_solution.apple_projects[selected] if selected >= 0
           return if self.xamarin_project
         end
+      else
+        self.xamarin_project = self.xamarin_solution.apple_projects.first
       end
 
       self.app_identifier = self.xamarin_project.default_app_identifier
       self.app_name = self.xamarin_project.default_app_name
-    end
-
-    def ask_for_apple_id
-      self.apple_id ||= UI.input("Your Apple ID (e.g. fastlane@krausefx.com): ")
     end
 
     # Detect if the app was created on the Dev Portal & iTunes Connect
@@ -126,6 +125,14 @@ module Fastlane
       Spaceship::Tunes.login(@apple_id, nil)
       self.itc_team = Spaceship::Tunes.select_team
       self.itc_ref = Spaceship::Application.find(self.app_identifier)
+    end
+
+    def ask_for_apple_id
+      self.apple_id ||= UI.input("Your Apple ID (e.g. fastlane@krausefx.com): ")
+    end
+
+    def ask_for_app_identifier
+      self.app_identifier = UI.input("App Identifier (com.krausefx.app): ")
     end
 
     def generate_appfile(manually: false)
@@ -168,15 +175,21 @@ module Fastlane
     end
 
     def default_setup
-      copy_existing_files # create backup of the project before doing any changes
-      generate_appfile(manually: true)
+      copy_existing_files
+      generate_appfile(manually: false)
       detect_installed_tools # after copying the existing files
-      ask_to_enable_other_tools
-      generate_fastfile(manually: true)
-      # show_analytics
+
+      if self.itc_ref.nil? && self.portal_ref.nil?
+        create_app_if_necessary
+      end
+
+      enable_deliver
+      generate_fastfile(manually: false)
+      show_analytics
     end
 
-    def manual_setup; end
+    def manual_setup;
+    end
 
     def restore_previous_state; end
 
@@ -211,10 +224,18 @@ module Fastlane
       begin
         ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
       rescue => exception
+        # Handle app name duplication problem
         if exception.to_s.include?("The App Name you entered has already been used")
           UI.important("It looks like that #{project.app_name} has already been taken by someone else, please enter an alternative.")
           Produce.config[:app_name] = UI.input("App Name: ")
           Produce.config[:skip_devcenter] = true # since we failed on iTC
+          ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
+        end
+
+        # Handle app identifier duplication problem
+        if exception.to_s.include?("An App ID with Identifier") && exception.to_s.include?("is not available")
+          UI.important("It looks like that #{self.app_identifier} has already been taken by someone else, please enter an alternative.")
+          Produce.config[:app_identifier] = UI.input("App Identifier: ")
           ENV['PRODUCE_APPLE_ID'] = Produce::Manager.start_producing
         end
       end
