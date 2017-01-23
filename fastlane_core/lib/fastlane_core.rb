@@ -30,10 +30,10 @@ require 'fastlane_core/fastlane_folder'
 require 'fastlane_core/keychain_importer'
 
 # Xamarin files
-require 'fastlane_core/lib/fastlane_core/xamarin/xamarin_project'
-require 'fastlane_core/lib/fastlane_core/xamarin/xamarin_project_parser'
-require 'fastlane_core/lib/fastlane_core/xamarin/xamarin_solution'
-require 'fastlane_core/lib/fastlane_core/xamarin/xamarin_solution_parser'
+require 'fastlane_core/xamarin/xamarin_project'
+require 'fastlane_core/xamarin/xamarin_project_parser'
+require 'fastlane_core/xamarin/xamarin_solution'
+require 'fastlane_core/xamarin/xamarin_solution_parser'
 
 # Third Party code
 require 'colored'
