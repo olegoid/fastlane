@@ -15,7 +15,8 @@ module Fastlane
       :source_control,
       :notifications,
       :deprecated,
-      :misc
+      :misc,
+      :xamarin
     ]
 
     class << self
