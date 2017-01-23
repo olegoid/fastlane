@@ -134,6 +134,7 @@ module FastlaneCore
     end
 
     def default_app_name
+      return self.info_plist['CFBundleName'] if self.info_plist['CFBundleName']
       self.info_plist['CFBundleDisplayName']
     end
   end
