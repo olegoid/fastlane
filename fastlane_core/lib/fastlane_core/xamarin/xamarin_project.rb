@@ -6,23 +6,23 @@ module FastlaneCore
     # https://github.com/mono/monodevelop/blob/master/main/src/core/MonoDevelop.Core/MonoDevelop.Core.addin.xml#L299
     @project_type_guid_map = {
         'Xamarin.iOS' => [
-            'E613F3A2-FE9C-494F-B74E-F63BCB86FEA6',
-            '6BC8ED88-2882-458C-8E55-DFD12B67127B',
-            'F5B4F3BC-B597-4E2B-B552-EF5D8A32436F',
-            'FEACFBD2-3405-455C-9665-78FE426C6842',
-            '8FFB629D-F513-41CE-95D2-7ECE97B6EEEC',
-            'EE2C853D-36AF-4FDB-B1AD-8E90477E2198'
+          'E613F3A2-FE9C-494F-B74E-F63BCB86FEA6',
+          '6BC8ED88-2882-458C-8E55-DFD12B67127B',
+          'F5B4F3BC-B597-4E2B-B552-EF5D8A32436F',
+          'FEACFBD2-3405-455C-9665-78FE426C6842',
+          '8FFB629D-F513-41CE-95D2-7ECE97B6EEEC',
+          'EE2C853D-36AF-4FDB-B1AD-8E90477E2198'
         ],
         'Xamarin.Android' => [
-            'EFBA0AD7-5A72-4C68-AF49-83D382785DCF',
-            '10368E6C-D01B-4462-8E8B-01FC667A7035'
+          'EFBA0AD7-5A72-4C68-AF49-83D382785DCF',
+          '10368E6C-D01B-4462-8E8B-01FC667A7035'
         ],
         'Xamarin.Mac' => [
-            '42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23',
-            'A3F8F2AB-B479-4A4A-A458-A89E7DC349F1'
+          '42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23',
+          'A3F8F2AB-B479-4A4A-A458-A89E7DC349F1'
         ],
         'Xamarin.tvOS' => [
-            '06FA79CB-D6CD-4721-BB4B-1BD202089C55'
+          '06FA79CB-D6CD-4721-BB4B-1BD202089C55'
         ]
     }
 
@@ -54,7 +54,7 @@ module FastlaneCore
     # Project type
     attr_accessor :type
 
-    def initialize()
+    def initialize
       self.type = []
       self.type_guids = []
       self.nugets = []
@@ -89,7 +89,6 @@ module FastlaneCore
 
   # extension module for Xamarin.iOS/tvOS/Mac projects
   module XamarinAppleProject
-
     # Info.plist file
     attr_accessor :info_plist
 
@@ -106,14 +105,14 @@ module FastlaneCore
 
       # searching for Info.plist path
       info_plist_path = nil
-      none_compile_nodes = project_doc.elements.to_a ("//Project/ItemGroup/None")
+      none_compile_nodes = project_doc.elements.to_a "//Project/ItemGroup/None"
       if none_compile_nodes and none_compile_nodes.length != 0
-        none_compile_nodes.each { |node_item|
+        none_compile_nodes.each do |node_item|
           if node_item.attributes["Include"].include? "Info.plist"
             info_plist_path = node_item.attributes["Include"]
             break
           end
-        }
+        end
       end
 
       if !info_plist_path or info_plist_path.to_s.length == 0
@@ -127,7 +126,7 @@ module FastlaneCore
         UI.user_error!("Could not find Info.plist file at path '#{project.info_plist_path}'")
       end
 
-      project.info_plist = Plist::parse_xml(project.info_plist_path)
+      project.info_plist = Plist.parse_xml(project.info_plist_path)
     end
 
     def default_app_identifier

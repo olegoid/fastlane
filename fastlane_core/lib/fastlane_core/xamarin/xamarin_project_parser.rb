@@ -15,27 +15,27 @@ module FastlaneCore
       project_doc = REXML::Document.new(file)
 
       # get project id
-      project_guid_nodes = project_doc.elements.to_a ("//Project/PropertyGroup/ProjectGuid")
+      project_guid_nodes = project_doc.elements.to_a "//Project/PropertyGroup/ProjectGuid"
       if project_guid_nodes and project_guid_nodes.length != 0
         project.id = project_guid_nodes.first.text.delete("{}")
       end
 
       # get project type guids
-      project_type_guid_nodes = project_doc.elements.to_a ("//Project/PropertyGroup/ProjectTypeGuids")
+      project_type_guid_nodes = project_doc.elements.to_a "//Project/PropertyGroup/ProjectTypeGuids"
 
       if project_type_guid_nodes and project_type_guid_nodes.length != 0
         project.type_guids = project_type_guid_nodes.first.text.delete("{}").split(';')
       end
 
       # get project output type
-      project_output_type_nodes = project_doc.elements.to_a ("//Project/PropertyGroup/OutputType")
+      project_output_type_nodes = project_doc.elements.to_a "//Project/PropertyGroup/OutputType"
 
       if project_output_type_nodes and project_output_type_nodes.length != 0
         project.output_type = project_output_type_nodes.first.text
       end
 
       # get project assembly name
-      project_assembly_name_nodes = project_doc.elements.to_a ("//Project/PropertyGroup/AssemblyName")
+      project_assembly_name_nodes = project_doc.elements.to_a "//Project/PropertyGroup/AssemblyName"
 
       if project_assembly_name_nodes and project_assembly_name_nodes.length != 0
         project.assembly_name = project_assembly_name_nodes.first.text
@@ -48,9 +48,9 @@ module FastlaneCore
         packages_config_file = File.new(packages_config_path)
         packages_config_doc = REXML::Document.new(packages_config_file)
 
-        packages_config_doc.elements.each ("packages/package/") { |element|
+        packages_config_doc.elements.each ("packages/package/") do |element|
           project.nugets << element.attributes["id"]
-        }
+        end
       end
 
       if project.ios? or project.mac? or project.tvos?

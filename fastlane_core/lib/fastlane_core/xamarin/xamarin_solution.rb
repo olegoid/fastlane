@@ -53,37 +53,37 @@ module FastlaneCore
     attr_accessor :configurations
 
     def apple_projects
-      l = lambda { |p| p.ios? or p.mac? or p.tvos? }
+      l = ->(p) { p.ios? or p.mac? or p.tvos? }
       self.projects.select &l
     end
 
     def ios_projects
-      l = lambda { |p| p.ios? }
+      l = ->(p) { p.ios? }
       self.projects.select &l
     end
 
     def mac_projects
-      l = lambda { |p| p.mac? }
+      l = ->(p) { p.mac? }
       self.projects.select &l
     end
 
     def tvos_projects
-      l = lambda { |p| p.tvos? }
+      l = ->(p) { p.tvos? }
       self.projects.select &l
     end
 
     def android_projects
-      l = lambda { |p| p.android? }
+      l = ->(p) { p.android? }
       self.projects.select &l
     end
 
     def unit_test_projects
-      l = lambda { |p| p.test? }
+      l = ->(p) { p.test? }
       self.projects.select &l
     end
 
     def ui_test_projects
-      l = lambda { |p| p.ui_test? }
+      l = ->(p) { p.ui_test? }
       self.projects.select &l
     end
   end

@@ -37,15 +37,15 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [ :xamarin ].include?(platform)
+        [:xamarin].include?(platform)
       end
 
       def self.example_code
         [
-            'restore_nugets(
-              solution_path: "../Solution.sln",
-              verbose: true
-            )'
+          'restore_nugets(
+            solution_path: "../Solution.sln",
+            verbose: true
+          )'
         ]
       end
     end

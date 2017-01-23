@@ -176,11 +176,9 @@ module Fastlane
       # show_analytics
     end
 
-    def manual_setup
-    end
+    def manual_setup; end
 
-    def restore_previous_state
-    end
+    def restore_previous_state; end
 
     def detect_installed_tools
       self.tools = {}

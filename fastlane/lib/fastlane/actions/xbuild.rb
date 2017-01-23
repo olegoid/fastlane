@@ -29,22 +29,22 @@ module Fastlane
 
       def self.available_options
         [
-            FastlaneCore::ConfigItem.new(key: :project_path,
-                                         env_name: "FL_XBUILD_PROJECT_PATH",
-                                         description: "Path to a project",
-                                         optional: false),
-            FastlaneCore::ConfigItem.new(key: :target,
-                                         env_name: "FL_XBUILD_TARGET",
-                                         description: "Xbuild target to run",
-                                         optional: true),
-            FastlaneCore::ConfigItem.new(key: :properties,
-                                         env_name: "FL_XBUILD_PROPERTIES",
-                                         description: "Hash with xbuild properties",
-                                         optional: true),
-            FastlaneCore::ConfigItem.new(key: :verbose,
-                                         env_name: "FL_XBUILD_VERBOSE",
-                                         description: "If set to true action will print out xbuild log",
-                                         optional: true)
+          FastlaneCore::ConfigItem.new(key: :project_path,
+                                       env_name: "FL_XBUILD_PROJECT_PATH",
+                                       description: "Path to a project",
+                                       optional: false),
+          FastlaneCore::ConfigItem.new(key: :target,
+                                       env_name: "FL_XBUILD_TARGET",
+                                       description: "Xbuild target to run",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :properties,
+                                       env_name: "FL_XBUILD_PROPERTIES",
+                                       description: "Hash with xbuild properties",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       env_name: "FL_XBUILD_VERBOSE",
+                                       description: "If set to true action will print out xbuild log",
+                                       optional: true)
         ]
       end
 
@@ -57,17 +57,17 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [ :xamarin ].include?(platform)
+        [:xamarin].include?(platform)
       end
 
       def self.example_code
         [
-            'xbuild(
-              project_path: "../Project.csproj",
-              target: "Build",
-              properties: { "BuildIpa": true },
-              verbose: true
-            )'
+          'xbuild(
+            project_path: "../Project.csproj",
+            target: "Build",
+            properties: { "BuildIpa": true },
+            verbose: true
+          )'
         ]
       end
     end

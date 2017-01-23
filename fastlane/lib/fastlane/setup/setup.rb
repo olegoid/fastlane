@@ -14,7 +14,7 @@ module Fastlane
       elsif is_android?
         UI.message("Detected Android project in current directory...")
         platform = :android
-      elseif is_xamarin?
+        elseif is_xamarin?
         UI.message("Detected Xamarin project in current directory...")
         platform = :xamarin
       else

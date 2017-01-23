@@ -20,22 +20,22 @@ module Fastlane
 
       def self.available_options
         [
-            FastlaneCore::ConfigItem.new(key: :solution_path,
-                                         env_name: "FL_XCOMPONENTS_SOLUTION_PATH",
-                                         description: "Path to solution file where you would like to restore Nuget packages",
-                                         optional: false),
-            FastlaneCore::ConfigItem.new(key: :solution_path,
-                                         env_name: "FL_XCOMPONENTS_USERNAME",
-                                         description: "Xamarin Components Store username",
-                                         optional: false),
-            FastlaneCore::ConfigItem.new(key: :solution_path,
-                                         env_name: "FL_XCOMPONENTS_PASSWORD",
-                                         description: "Xamarin Components Store password",
-                                         optional: true),
-            FastlaneCore::ConfigItem.new(key: :verbose,
-                                         env_name: "FL_XCOMPONENTS_VERBOSE",
-                                         description: "If set to true action will print out components restore log",
-                                         optional: true)
+          FastlaneCore::ConfigItem.new(key: :solution_path,
+                                       env_name: "FL_XCOMPONENTS_SOLUTION_PATH",
+                                       description: "Path to solution file where you would like to restore Nuget packages",
+                                       optional: false),
+          FastlaneCore::ConfigItem.new(key: :solution_path,
+                                       env_name: "FL_XCOMPONENTS_USERNAME",
+                                       description: "Xamarin Components Store username",
+                                       optional: false),
+          FastlaneCore::ConfigItem.new(key: :solution_path,
+                                       env_name: "FL_XCOMPONENTS_PASSWORD",
+                                       description: "Xamarin Components Store password",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :verbose,
+                                       env_name: "FL_XCOMPONENTS_VERBOSE",
+                                       description: "If set to true action will print out components restore log",
+                                       optional: true)
         ]
       end
 
@@ -48,17 +48,17 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [ :xamarin ].include?(platform)
+        [:xamarin].include?(platform)
       end
 
       def self.example_code
         [
-            'restore_xamarin_components(
-              solution_path: "../Solution.sln",
-              username: "xamarin.user@gmail.com",
-              password: "1234"
-              verbose: true
-            )'
+          'restore_xamarin_components(
+            solution_path: "../Solution.sln",
+            username: "xamarin.user@gmail.com",
+            password: "1234"
+            verbose: true
+          )'
         ]
       end
 
