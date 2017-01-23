@@ -86,7 +86,7 @@ module Fastlane
 
     def setup_project
       config = {}
-      FastlaneCore::XamarinSolution.detect_projects(config)
+      FastlaneCore::XamarinSolution.detect_solutions(config)
       self.xamarin_solution = FastlaneCore::XamarinSolution.new(config)
 
       if self.xamarin_solution.apple_projects.lenght > 1
@@ -113,7 +113,7 @@ module Fastlane
       self.apple_id ||= UI.input("Your Apple ID (e.g. fastlane@krausefx.com): ")
     end
 
-    # Detect if the app was created on the Dev Portal / iTC
+    # Detect if the app was created on the Dev Portal & iTunes Connect
     def detect_if_app_is_available
       require 'spaceship'
 
@@ -168,7 +168,7 @@ module Fastlane
     end
 
     def default_setup
-      copy_existing_files
+      copy_existing_files # create backup of the project before doing any changes
       generate_appfile(manually: true)
       detect_installed_tools # after copying the existing files
       ask_to_enable_other_tools
@@ -184,6 +184,7 @@ module Fastlane
 
     def detect_installed_tools
       self.tools = {}
+      # TODO: add nuget, xamarin-packages, Xamarin.UITest actions here
     end
 
     def ask_to_enable_other_tools
@@ -228,6 +229,12 @@ module Fastlane
       options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
       Deliver::Runner.new(options) # to login...
       Deliver::Setup.new.run(options)
+    end
+
+    def generate_fastfile(manually: false)
+      build_configuration = self.xamarin_solution.configurations.first unless manually
+
+      template = File.read("#{Fastlane::ROOT}/lib/assets/DefaultXamarinFastfileTemplate")
     end
   end
 end
