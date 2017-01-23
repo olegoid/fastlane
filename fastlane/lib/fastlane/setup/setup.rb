@@ -28,6 +28,7 @@ module Fastlane
       elsif platform == :android
         SetupAndroid.new.run
       elsif platform == :xamarin
+        SetupXamarin.new.run
       else
         UI.user_error!("Couldn't find platform '#{platform}'")
       end
@@ -42,7 +43,7 @@ module Fastlane
     end
 
     def is_xamarin?
-      Dir["*.csproj"].count > 0
+      (Dir["*.csproj"] + Dir["*.sln"]).count > 0
     end
 
     def show_analytics
@@ -55,6 +56,7 @@ end
 
 require 'fastlane/setup/setup_ios'
 require 'fastlane/setup/setup_android'
+require 'fastlane/setup/setup_xamarin'
 require 'fastlane/setup/crashlytics_beta_ui'
 require 'fastlane/setup/crashlytics_beta'
 require 'fastlane/setup/crashlytics_project_parser'
