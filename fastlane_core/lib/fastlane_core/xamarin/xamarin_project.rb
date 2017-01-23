@@ -26,6 +26,10 @@ module FastlaneCore
         ]
     }
 
+    class << self
+      attr_accessor :project_type_guid_map
+    end
+
     # Project name
     attr_accessor :name
 
@@ -41,72 +45,45 @@ module FastlaneCore
     # Project output type(library, exe, etc.) - <OutputType/>
     attr_accessor :output_type
 
-    # Project assembly name  - <AssemblyName/>
+    # Project assembly name - <AssemblyName/>
     attr_accessor :assembly_name
 
-    # Project assembly name  - <AssemblyName/>
-    attr_accessor :assembly_name
+    # NuGet packages
+    attr_accessor :nugets
 
-    def initialize(path)
-      self.path = path
+    # Project type
+    attr_accessor :type
 
-      if !path or !File.directory?(path)
-        UI.user_error!("Could not find project at path '#{path}'")
-      end
-
-      self.name = File.basename(path).gsub!(Regexp.union('.csproj', '.shproj', 'fsproj'), '')
-
-      file = File.new(path)
-      project_doc = REXML::Document.new(file)
-
-      # get project id
-      project_guid_nodes = project_doc.elements.to_a ("//Project/PropertyGroup/ProjectGuid")
-      if project_guid_nodes and project_guid_nodes.lenght != 0
-        self.id = project_guid_nodes.first.text.delete("{}")
-      end
-
-      # get project type guids
-      project_type_guid_nodes = project_doc.elements.to_a ("//Project/PropertyGroup/ProjectTypeGuids")
-
-      if project_type_guid_nodes and project_type_guid_nodes.lenght != 0
-        self.type_guids = project_type_guid_nodes.first.text.delete("{}").split(';')
-      end
-
-      # get project output type
-      project_output_type_nodes = project_doc.elements.to_a ("//Project/PropertyGroup/OutputType")
-
-      if project_output_type_nodes and project_output_type_nodes.lenght != 0
-        self.output_type = project_output_type_nodes.first.text
-      end
-
-      # get project assembly name
-      project_assembly_name_nodes = project_doc.elements.to_a ("//Project/PropertyGroup/AssemblyName")
-
-      if project_assembly_name_nodes and project_assembly_name_nodes.lenght != 0
-        self.assembly_name = project_assembly_name_nodes.first.text
-      end
-
-      if ios? or mac? or tvos?
-        self.extend(XamarinAppleProject)
-      elsif anddroid?
-        self.extend(XamarinAndroidProject)
-      end
+    def initialize()
+      self.type = []
+      self.type_guids = []
+      self.nugets = []
     end
 
     def ios?
-      (project_type_guid_map['Xamarin.iOS'] & type_guids).any?
+      (XamarinProject.project_type_guid_map['Xamarin.iOS'] & self.type_guids).any?
     end
 
     def mac?
-      (project_type_guid_map['Xamarin.Mac'] & type_guids).any?
+      (XamarinProject.project_type_guid_map['Xamarin.Mac'] & self.type_guids).any?
     end
 
     def tvos?
-      (project_type_guid_map['Xamarin.tvOS'] & type_guids).any?
+      (XamarinProject.project_type_guid_map['Xamarin.tvOS'] & self.type_guids).any?
     end
 
     def android?
-      (project_type_guid_map['Xamarin.Android'] & type_guids).any?
+      (XamarinProject.project_type_guid_map['Xamarin.Android'] & self.type_guids).any?
+    end
+
+    def test?
+      return false if self.nugets.nil?
+      return false if self.nugets.include? 'Xamarin.UITest'
+      self.nugets.include? 'NUnit'
+    end
+
+    def ui_test?
+      self.nugets.include? 'Xamarin.UITest'
     end
   end
 
@@ -115,6 +92,9 @@ module FastlaneCore
 
     # Info.plist file
     attr_accessor :info_plist
+
+    # Path to Info.plist
+    attr_accessor :info_plist_path
 
     def self.extended(project)
       require "plist"
@@ -127,8 +107,8 @@ module FastlaneCore
       # searching for Info.plist path
       info_plist_path = nil
       none_compile_nodes = project_doc.elements.to_a ("//Project/ItemGroup/None")
-      if none_compile_nodes and none_compile_nodes.lenght != 0
-        project_guid_nodes.each { |node_item|
+      if none_compile_nodes and none_compile_nodes.length != 0
+        none_compile_nodes.each { |node_item|
           if node_item.attributes["Include"].include? "Info.plist"
             info_plist_path = node_item.attributes["Include"]
             break
@@ -140,13 +120,14 @@ module FastlaneCore
         UI.user_error!("Could not find Info.plist file reference in project at path '#{project.path}'")
       end
 
-      info_plist_path = File.Join(File.directory?(project.path), info_plist_path)
+      project_path = File.dirname(project.path)
+      project.info_plist_path = File.join(project_path, info_plist_path)
 
-      if !info_plist_path or !File.directory?(info_plist_path)
-        UI.user_error!("Could not find Info.plist file at path '#{info_plist_path}'")
+      if !project.info_plist_path or !File.file?(project.info_plist_path)
+        UI.user_error!("Could not find Info.plist file at path '#{project.info_plist_path}'")
       end
 
-      self.info_plist = Plist::parse_xml(info_plist_path)
+      project.info_plist = Plist::parse_xml(project.info_plist_path)
     end
 
     def default_app_identifier
