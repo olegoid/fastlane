@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class Xbuild < Action
       def self.run(options)
-        FastlaneCore::UI.message("Running xbuild...")
+        UI.message("Running xbuild")
 
         properties_string = nil
         if options[:properties]
@@ -24,32 +24,40 @@ module Fastlane
       end
 
       def self.description
-        "Runs xbuild with given parameters(target, properties, project)."
+        "Runs xbuild with given parameters(target, properties, project)"
       end
 
       def self.available_options
         [
             FastlaneCore::ConfigItem.new(key: :project_path,
                                          env_name: "FL_XBUILD_PROJECT_PATH",
-                                         description: "Path to a project.",
+                                         description: "Path to a project",
                                          optional: false),
             FastlaneCore::ConfigItem.new(key: :target,
                                          env_name: "FL_XBUILD_TARGET",
-                                         description: "Xbuild target to run.",
+                                         description: "Xbuild target to run",
                                          optional: true),
             FastlaneCore::ConfigItem.new(key: :properties,
                                          env_name: "FL_XBUILD_PROPERTIES",
-                                         description: "Hash with xbuild properties.",
+                                         description: "Hash with xbuild properties",
                                          optional: true),
             FastlaneCore::ConfigItem.new(key: :verbose,
                                          env_name: "FL_XBUILD_VERBOSE",
-                                         description: "If set to true action will print out xbuild log.",
+                                         description: "If set to true action will print out xbuild log",
                                          optional: true)
         ]
       end
 
       def self.category
         :xamarin
+      end
+
+      def self.author
+        "olegoid"
+      end
+
+      def self.is_supported?(platform)
+        [ :xamarin ].include?(platform)
       end
 
       def self.example_code
