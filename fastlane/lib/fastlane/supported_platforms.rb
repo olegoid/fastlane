@@ -4,7 +4,8 @@ module Fastlane
       [
         :ios,
         :mac,
-        :android
+        :android,
+        :xamarin
       ]
     end
 
