@@ -1,30 +1,32 @@
 module Fastlane
   module Actions
-    class Xbuild < Action
+    class XbuildAction < Action
       def self.run(options)
-        UI.message("Running xbuild")
+        cmd = []
+        cmd << 'xbuild'
 
-        properties_string = nil
+        properties_string = ''
         if options[:properties]
-          hash.each do |key, value|
+          options[:properties].each do |key, value|
             properties_string += "/p:#{key}=#{value} "
           end
         end
 
-        target_string = nil
+        cmd << properties_string if options[:properties]
+
+        target_string = ''
         if options[:target]
           target_string = "/t:#{options[:target]}"
         end
 
-        Open3.popen3("xbuild #{target_string} #{properties_string} #{File.dirname(options[:project_path])}") do |_, stdout, _, wait_thr|
-          stdout.each do |line|
-            print line if options[:verbose]
-          end
-        end
+        cmd << target_string if options[:target]
+        cmd << options[:project_path] if options[:project_path]
+
+        Fastlane::Action.sh(cmd.join(' '), print_command_output: options[:verbose])
       end
 
       def self.description
-        "Runs xbuild with given parameters(target, properties, project)"
+        "Runs xbuild"
       end
 
       def self.available_options
@@ -32,20 +34,31 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :project_path,
                                        env_name: "FL_XBUILD_PROJECT_PATH",
                                        description: "Path to a project",
-                                       optional: false),
+                                       optional: true,
+                                       is_string: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Could not find Xamarin project") unless File.exist?(value) || Helper.test?
+                                       end),
           FastlaneCore::ConfigItem.new(key: :target,
                                        env_name: "FL_XBUILD_TARGET",
                                        description: "Xbuild target to run",
+                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :properties,
                                        env_name: "FL_XBUILD_PROPERTIES",
                                        description: "Hash with xbuild properties",
+                                       is_string: false, # properties should be provided in Hash format
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_XBUILD_VERBOSE",
                                        description: "If set to true action will print out xbuild log",
-                                       optional: true)
+                                       is_string: false,
+                                       default_value: true)
         ]
+      end
+
+      def self.details
+        "Multipurpose build engine for .NET projects. If you're going to use it to build *.ipa files don't forget to pass { \"BuildIpa\": true }"
       end
 
       def self.category
@@ -62,7 +75,8 @@ module Fastlane
 
       def self.example_code
         [
-          'xbuild(
+          'xbuild,
+           xbuild(
             project_path: "../Project.csproj",
             target: "Build",
             properties: { "BuildIpa": true },
