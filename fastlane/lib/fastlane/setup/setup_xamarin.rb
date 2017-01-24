@@ -188,8 +188,7 @@ module Fastlane
       show_analytics
     end
 
-    def manual_setup;
-    end
+    def manual_setup; end
 
     def restore_previous_state; end
 
@@ -251,9 +250,15 @@ module Fastlane
     end
 
     def generate_fastfile(manually: false)
-      build_configuration = self.xamarin_solution.configurations.first unless manually
-
       template = File.read("#{Fastlane::ROOT}/lib/assets/DefaultXamarinFastfileTemplate")
+
+      template.gsub!('[[PROJECT]]', "\"#{self.xamarin_project.path}\"")
+      template.gsub!('nunit', '# nunit') if self.xamarin_solution.unit_test_projects.length == 0
+      template.gsub!('[[FASTLANE_VERSION]]', Fastlane::VERSION)
+
+      path = File.join(folder, 'Fastfile')
+      File.write(path, template)
+      UI.success("Created new file '#{path}'. Edit it to manage your own deployment lanes.")
     end
   end
 end
