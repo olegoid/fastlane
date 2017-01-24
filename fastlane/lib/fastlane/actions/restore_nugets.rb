@@ -1,30 +1,42 @@
 module Fastlane
   module Actions
-    class RestoreNugets < Action
+    class RestoreNugetsAction < Action
       def self.run(options)
-        UI.message("Restoring Nuget packages")
+        cmd = []
 
-        Open3.popen3("nuget restore #{File.dirname(options[:solution_path])}") do |_, stdout, _, wait_thr|
-          stdout.each do |line|
-            print line if options[:verbose]
+        unless options[:solution_path].nil?
+          if options[:solution_path].end_with?('.sln')
+            solution_folder = File.dirname(options[:solution_path])
+          else
+            solution_folder = options[:podfile]
           end
+          cmd << ["cd '#{solution_folder}' &&"]
         end
+
+        cmd << ['nuget restore']
+
+        Fastlane::Action.sh(cmd.join(' '), print_command_output: options[:verbose])
       end
 
       def self.description
-        "Restores Nuget packages"
+        "Runs `nuget restore` for the solution"
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :solution_path,
                                        env_name: "FL_NUGET_SOLUTION_PATH",
-                                       description: "Path to solution file whe you would like to restore Nuget packages",
-                                       optional: false),
+                                       description: "Path to solution file where you would like to restore Nuget packages",
+                                       optional: true,
+                                       is_string: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Could not find solution file") unless File.exist?(value) || Helper.test?
+                                       end),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_NUGET_VERBOSE",
                                        description: "If set to true action will print out Nuget log",
-                                       optional: true)
+                                       is_string: false,
+                                       default_value: true)
         ]
       end
 
@@ -42,9 +54,10 @@ module Fastlane
 
       def self.example_code
         [
-          'restore_nugets(
+          'restore_nugets,
+           restore_nugets(
             solution_path: "../Solution.sln",
-            verbose: true
+            verbose: false
           )'
         ]
       end
