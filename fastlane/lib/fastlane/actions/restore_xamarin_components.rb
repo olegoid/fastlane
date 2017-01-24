@@ -1,17 +1,33 @@
 module Fastlane
   module Actions
-    class RestoreXamarinComponents < Action
+    class RestoreXamarinComponentsAction < Action
       def self.run(options)
         components_exe = xamarin_components_exe
-        UI.message("Login to Xamarin Components store")
-        system("mono #{components_exe} login #{options[:username]} #{options[:password]}")
 
-        FastlaneCore::UI.message("Restoring Xamarin Components")
-        Open3.popen3("mono #{xamarin_components_exe} restore #{options[:solution_path]}") do |_, stdout, _, wait_thr|
-          stdout.each do |line|
-            print line if options[:verbose]
-          end
+        delete_xamarin_cookiejar
+
+        login_cmd = []
+        login_cmd << ["mono #{components_exe} login"]
+
+        login_cmd << (options[:username]).to_s if options[:username]
+        login_cmd << "-password=#{options[:password]}" if options[:password]
+        login_cmd << "-production"
+
+        # User can prompted to enter password.
+        Actions.sh(login_cmd.join(' '))
+
+        restore_components_cmd = []
+        restore_components_cmd << ["mono #{components_exe} restore"]
+
+        if options[:solution_path]
+          restore_components_cmd << (options[:solution_path]).to_s
+        else
+          config = {}
+          FastlaneCore::XamarinSolution.detect_solutions(config)
+          restore_components_cmd << (config[:xamarin_solution]).to_s
         end
+
+        Fastlane::Action.sh(restore_components_cmd.join(' '), print_command_output: options[:verbose])
       end
 
       def self.description
@@ -22,21 +38,31 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :solution_path,
                                        env_name: "FL_XCOMPONENTS_SOLUTION_PATH",
-                                       description: "Path to solution file where you would like to restore Nuget packages",
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :solution_path,
+                                       description: "Path to solution file where you would like to restore Xamarin Components",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Could not find Xamarin solution") unless File.exist?(value) || Helper.test?
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_XCOMPONENTS_USERNAME",
                                        description: "Xamarin Components Store username",
                                        optional: false),
-          FastlaneCore::ConfigItem.new(key: :solution_path,
+          FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_XCOMPONENTS_PASSWORD",
                                        description: "Xamarin Components Store password",
-                                       optional: true),
+                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_XCOMPONENTS_VERBOSE",
                                        description: "If set to true action will print out components restore log",
-                                       optional: true)
+                                       is_string: false,
+                                       default_value: true)
         ]
+      end
+
+      # delete .xamarin-credentials file if exist
+      def self.delete_xamarin_cookiejar
+        xamarin_credentials = File.join(ENV["HOME"], ".xamarin-credentials")
+        File.delete(xamarin_credentials) if File.exist?(xamarin_credentials)
       end
 
       def self.category
