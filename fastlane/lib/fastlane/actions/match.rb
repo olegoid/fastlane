@@ -50,7 +50,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :xamarin].include? platform
       end
 
       def self.example_code
