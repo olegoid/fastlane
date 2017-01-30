@@ -78,7 +78,6 @@ module FastlaneCore
 
     def test?
       return false if self.nugets.nil?
-      return false if self.nugets.include? 'Xamarin.UITest'
       self.nugets.include? 'NUnit'
     end
 
