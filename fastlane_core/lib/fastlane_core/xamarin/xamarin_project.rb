@@ -125,7 +125,11 @@ module FastlaneCore
         UI.user_error!("Could not find Info.plist file at path '#{project.info_plist_path}'")
       end
 
-      project.info_plist = Plist.parse_xml(project.info_plist_path)
+      begin
+        project.info_plist = Plist.parse_xml(project.info_plist_path)
+      rescue
+        UI.user_error!("Info.plist at path #{project.info_plist_path} is malformed")
+      end
     end
 
     def default_app_identifier
