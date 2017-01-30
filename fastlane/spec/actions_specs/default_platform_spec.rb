@@ -9,7 +9,7 @@ describe Fastlane do
       it "raises an error if platform is not supported" do
         expect do
           Fastlane::Actions::DefaultPlatformAction.run(['notSupportedOS'])
-        end.to raise_error("Platform 'notSupportedOS' is not supported. Must be either [:ios, :mac, :android]")
+        end.to raise_error("Platform 'notSupportedOS' is not supported. Must be either [:ios, :mac, :android, :xamarin]")
       end
 
       it "raises an error if no platform is given" do
