@@ -9,13 +9,21 @@ module FastlaneCore
 
       project.path = path
 
-      project.name = File.basename(path).gsub!(Regexp.union('.csproj', '.shproj', 'fsproj'), '')
+      project.name = File.basename(path).gsub!(Regexp.union('.csproj', '.shproj', '.fsproj'), '')
 
       file = File.new(path)
-      project_doc = REXML::Document.new(file)
+
+      project_doc = nil
+
+      begin
+        project_doc = REXML::Document.new(file)
+      rescue
+        UI.user_error!("Project at path \"#{project.path}\" is malformed")
+      end
 
       # get project id
       project_guid_nodes = project_doc.elements.to_a "//Project/PropertyGroup/ProjectGuid"
+
       if project_guid_nodes and project_guid_nodes.length != 0
         project.id = project_guid_nodes.first.text.delete("{}")
       end
@@ -46,7 +54,14 @@ module FastlaneCore
 
       if File.exist?(packages_config_path)
         packages_config_file = File.new(packages_config_path)
-        packages_config_doc = REXML::Document.new(packages_config_file)
+
+        packages_config_doc = nil
+
+        begin
+          packages_config_doc = REXML::Document.new(packages_config_file)
+        rescue
+          UI.user_error!("packages.config file at #{project.name} is malformed")
+        end
 
         packages_config_doc.elements.each ("packages/package/") do |element|
           project.nugets << element.attributes["id"]

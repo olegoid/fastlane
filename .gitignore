@@ -53,3 +53,14 @@ spec/fixtures/*.itmsp/*.png
 **/report.xml
 **/.bundle
 fastlane/lib/fastlane/plugins/template/.rubocop.yml
+
+# Xamarin specific
+*.stamp
+bin
+obj
+*.userprefs
+packages
+*.lock.json
+*.nuget.props
+*.nuget.target
+*.user
