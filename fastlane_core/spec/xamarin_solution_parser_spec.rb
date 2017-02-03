@@ -25,11 +25,13 @@ describe FastlaneCore do
       end
 
       it 'parses solution configurations' do
-
+        solution = FastlaneCore::XamarinSolutionParser.parse("./fastlane_core/spec/fixtures/projects/Xamarin/Solution II.sln")
+        expect(solution.configurations.count).to eq(4)
       end
 
       it 'parses projects referenced in solution' do
-
+        solution = FastlaneCore::XamarinSolutionParser.parse("./fastlane_core/spec/fixtures/projects/Xamarin/Solution II.sln")
+        expect(solution.projects.count).to eq(6)
       end
     end
   end

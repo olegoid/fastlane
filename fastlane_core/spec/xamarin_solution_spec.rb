@@ -1,5 +1,3 @@
-require 'fileutils'
-
 describe FastlaneCore do
   describe FastlaneCore::XamarinSolution do
     describe 'solution file detection' do
@@ -94,48 +92,6 @@ describe FastlaneCore do
 
           expect(config[:xamarin_solution]).to eq(File.join(path, solution))
         end
-      end
-    end
-
-    describe 'apple_projects' do
-      it "returns only iOS, tvOS, Mac projects referenced to solution" do
-
-      end
-    end
-
-    describe 'ios_projects' do
-      it "returns only iOS projects referenced to solution" do
-
-      end
-    end
-
-    describe 'mac_projects' do
-      it "returns only Mac projects referenced to solution" do
-
-      end
-    end
-
-    describe 'tvos_projects' do
-      it "returns only tvOS projects referenced to solution" do
-
-      end
-    end
-
-    describe 'android_projects' do
-      it "returns only Android projects referenced to solution" do
-
-      end
-    end
-
-    describe 'unit_test_projects' do
-      it "returns only Nunit test library projects referenced to solution" do
-
-      end
-    end
-
-    describe 'ui_test_projects' do
-      it "returns only projects with refrenced Xamarin.UITest package" do
-
       end
     end
   end

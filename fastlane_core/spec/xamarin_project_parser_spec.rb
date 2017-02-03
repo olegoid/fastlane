@@ -27,11 +27,6 @@ describe FastlaneCore do
         expect(project.name).to eq("iOS_FSharp")
       end
 
-      it 'parses name of *.shproj(shared) projects correctly' do
-        project = FastlaneCore::XamarinProjectParser.parse("./fastlane_core/spec/fixtures/projects/Xamarin/Shared/Shared.shproj")
-        expect(project.name).to eq("Shared")
-      end
-
       it 'shows user error if project file is malformed' do
         expect do
           FastlaneCore::XamarinProjectParser.parse("./fastlane_core/spec/fixtures/projects/Xamarin/Malformed/Malformed.csproj")
