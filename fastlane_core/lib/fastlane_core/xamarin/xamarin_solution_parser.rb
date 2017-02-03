@@ -29,7 +29,7 @@ module FastlaneCore
         project_full_path = File.join(solution_path, project_path.chop)
 
         # skip files that are directories
-        accepted_project_types = [".csproj", ".fsproj", "*.shproj"]
+        accepted_project_types = [".csproj", ".fsproj"]
         if accepted_project_types.include? File.extname(project_full_path)
           solution.projects << XamarinProjectParser.parse(project_full_path)
         end
@@ -39,7 +39,7 @@ module FastlaneCore
       solution_conf = solution_content.match(REGEX_SOLUTION_CONFIGURATION)
       if !solution_conf.nil? and solution_conf.length > 0
         raw_configs = solution_conf[0].split("\r\n\t\t")
-        raw_configs.each do |conf_string|
+        raw_configs.drop(1).each do |conf_string|
           next if !conf_string or conf_string.to_s.length == 0
 
           conf_string.gsub!(/[\n\t\r]/, '')

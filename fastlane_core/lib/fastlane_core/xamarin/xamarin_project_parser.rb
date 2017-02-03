@@ -9,7 +9,7 @@ module FastlaneCore
 
       project.path = path
 
-      project.name = File.basename(path).gsub!(Regexp.union('.csproj', '.shproj', '.fsproj'), '')
+      project.name = File.basename(path).gsub!(Regexp.union('.csproj', '.fsproj'), '')
 
       file = File.new(path)
 
